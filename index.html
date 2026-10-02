@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f47b20">
+<title>For You — A Little World Made With Love ♡</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap');
+
+:root{
+  --orange:#f47b20;
+  --orange2:#ff9f43;
+  --peach:#ffd8bd;
+  --cream:#fff8ed;
+  --yellow:#ffd166;
+  --coral:#ef6f61;
+  --brown:#4a281d;
+  --ink:#382019;
+  --pink:#f3a6a0;
+  --green:#718c6b;
+  --lav:#c7b8ea;
+  --white:#fffdf8;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+}
+button{font:inherit;cursor:pointer}
+img,video{max-width:100%;display:block}
+.hidden{display:none!important}
+
+/* ---------- PASSCODE ---------- */
+#gate{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(circle at 20% 20%,#ffb66b 0 4%,transparent 5%),
+    radial-gradient(circle at 80% 25%,#ffd166 0 3%,transparent 4%),
+    linear-gradient(135deg,#f47b20,#f9a45b 45%,#ffd8bd);
+  padding:25px;
+}
+#gate:before{
+  content:"";
+  position:absolute;inset:15px;border:2px dashed rgba(255,255,255,.55);
+  border-radius:35px;pointer-events:none;
+}
+.gate-card{
+  width:min(480px,100%);text-align:center;
+  background:rgba(255,253,248,.93);
+  border:3px solid rgba(255,255,255,.7);
+  border-radius:34px;padding:42px 28px;
+  box-shadow:0 30px 70px rgba(73,36,18,.25);
+  position:relative;
+}
+.gate-bow{font-size:54px;animation:float 3s ease-in-out infinite}
+.script{font-family:'Caveat',cursive}
+.gate-card h1{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(42px,9vw,70px);line-height:.95;
+  color:var(--orange);margin:8px 0;
+}
+.gate-card p{opacity:.72;margin:10px auto 22px;max-width:330px}
+.dots{display:flex;justify-content:center;gap:10px;margin:18px 0}
+.dot{
+  width:14px;height:14px;border-radius:50%;
+  border:2px solid var(--orange);background:transparent;
+}
+.dot.filled{background:var(--orange)}
+.keypad{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  max-width:300px;margin:auto;
+}
+.key{
+  border:0;border-radius:18px;padding:15px;background:#fff;
+  color:var(--orange);font-weight:700;
+  box-shadow:0 5px 14px rgba(100,50,20,.10);
+  transition:.18s;
+}
+.key:hover{transform:translateY(-2px);background:#fff1e5}
+.key:active{transform:scale(.95)}
+.gate-note{font-size:12px;opacity:.55;margin-top:16px}
+#error{color:#c94b3c;font-size:13px;min-height:18px;margin-top:8px}
+
+/* ---------- GLOBAL ---------- */
+.section{
+  position:relative;padding:105px 7vw;overflow:hidden;
+}
+.section-inner{max-width:1120px;margin:auto}
+.section-kicker{
+  text-transform:uppercase;letter-spacing:4px;font-size:12px;
+  color:var(--orange);font-weight:700;margin-bottom:10px;
+}
+.section-title{
+  font-family:'Playfair Display',serif;font-size:clamp(38px,7vw,72px);
+  line-height:1;color:var(--brown);
+}
+.section-sub{max-width:650px;line-height:1.8;opacity:.7;margin-top:15px}
+.paper{
+  background:var(--white);
+  border:1px solid rgba(74,40,29,.08);
+  box-shadow:0 20px 50px rgba(89,47,25,.10);
+}
+.blob{
+  position:absolute;border-radius:50%;filter:blur(1px);opacity:.5;
+  pointer-events:none;
+}
+.blob.one{width:220px;height:220px;background:#ffd166;top:40px;right:-80px}
+.blob.two{width:180px;height:180px;background:#f3a6a0;bottom:10px;left:-80px}
+
+/* ---------- HERO ---------- */
+#world{display:none}
+.hero{
+  min-height:100vh;padding:45px 7vw 80px;
+  background:
+   radial-gradient(circle at 8% 18%,rgba(255,209,102,.7) 0 3%,transparent 3.5%),
+   radial-gradient(circle at 92% 30%,rgba(243,166,160,.55) 0 5%,transparent 5.5%),
+   linear-gradient(135deg,#fff8ed,#ffd8bd 55%,#ffe9b8);
+  position:relative;overflow:hidden;
+}
+.hero-top{display:flex;justify-content:space-between;align-items:center;max-width:1120px;margin:auto}
+.logo{font-family:'Caveat',cursive;font-size:27px;color:var(--orange)}
+.sound-btn{
+  border:1px solid rgba(74,40,29,.15);background:rgba(255,255,255,.6);
+  border-radius:999px;padding:10px 15px;color:var(--brown)
+}
+.hero-content{max-width:1120px;margin:70px auto 0;position:relative;z-index:2}
+.hero-small{font-size:14px;letter-spacing:3px;text-transform:uppercase;opacity:.65}
+.hero h2{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(62px,13vw,150px);line-height:.82;
+  color:var(--orange);max-width:900px;margin:15px 0 25px;
+}
+.hero h2 span{color:var(--brown);display:block}
+.hero-message{font-size:18px;max-width:530px;line-height:1.8}
+.scroll{
+  display:inline-block;margin-top:35px;text-decoration:none;color:var(--brown);
+  border-bottom:1px solid var(--brown);padding-bottom:5px;
+}
+.hero-photo{
+  position:absolute;right:8vw;top:38%;width:min(300px,35vw);
+  transform:rotate(5deg);z-index:1;
+}
+.photo-frame{
+  background:white;padding:12px 12px 42px;box-shadow:0 18px 45px rgba(80,40,20,.2);
+}
+.photo-frame img{width:100%;aspect-ratio:1/1;object-fit:cover}
+.tape{position:absolute;width:90px;height:25px;background:#ffd166;top:-12px;left:50%;transform:translateX(-50%) rotate(-3deg);opacity:.8}
+.hero-sticker{
+  position:absolute;bottom:-25px;left:-40px;width:100px;height:100px;
+  background:var(--orange);color:white;border-radius:50%;
+  display:grid;place-items:center;text-align:center;font-family:'Caveat',cursive;font-size:24px;
+  transform:rotate(-12deg)
+}
+.floating{animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-12px) rotate(2deg)}}
+
+/* ---------- REASONS ---------- */
+.reasons{background:#fff4e8}
+.reason-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:45px}
+.reason{
+  min-height:210px;padding:28px;border-radius:28px;
+  background:var(--white);position:relative;overflow:hidden;
+  transform:rotate(var(--r));
+}
+.reason:nth-child(2){--r:1.2deg;background:#fff0bd}
+.reason:nth-child(3){--r:-1deg;background:#f9d2cb}
+.reason:nth-child(4){--r:.7deg;background:#e9dfc8}
+.reason:nth-child(5){--r:-.8deg;background:#ffd8bd}
+.reason:nth-child(6){--r:1deg;background:#dfe7d5}
+.reason .emoji{font-size:34px}
+.reason h3{font-family:'Caveat',cursive;font-size:30px;margin:18px 0 7px}
+.reason p{line-height:1.7;font-size:14px;opacity:.72}
+
+/* ---------- MEMORIES ---------- */
+.memories{background:#f7e8dd}
+.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:45px}
+.polaroid{
+  background:white;padding:10px 10px 35px;
+  box-shadow:0 12px 30px rgba(73,40,25,.13);
+  transform:rotate(var(--r));transition:.3s;
+}
+.polaroid:hover{transform:rotate(0) translateY(-8px) scale(1.02)}
+.polaroid img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.polaroid figcaption{font-family:'Caveat',cursive;font-size:22px;margin-top:10px;text-align:center}
+.memory-grid .polaroid:nth-child(1){--r:-3deg}
+.memory-grid .polaroid:nth-child(2){--r:2deg}
+.memory-grid .polaroid:nth-child(3){--r:-1deg}
+.memory-grid .polaroid:nth-child(4){--r:3deg}
+.memory-grid .polaroid:nth-child(5){--r:2deg}
+.memory-grid .polaroid:nth-child(6){--r:-2deg}
+.memory-grid .polaroid:nth-child(7){--r:1deg}
+.memory-grid .polaroid:nth-child(8){--r:-3deg}
+
+/* ---------- TIMELINE ---------- */
+.timeline-wrap{margin-top:55px;position:relative}
+.timeline-wrap:before{
+  content:"";position:absolute;left:20px;top:0;bottom:0;width:3px;background:#f5bb82;
+}
+.timeline-item{position:relative;padding:0 0 45px 65px}
+.timeline-dot{
+  position:absolute;left:7px;top:2px;width:29px;height:29px;
+  border-radius:50%;background:var(--orange);border:6px solid #fff0df;
+}
+.timeline-item h3{font-family:'Caveat',cursive;font-size:31px;color:var(--orange)}
+.timeline-item p{max-width:700px;line-height:1.8;margin-top:5px;opacity:.75}
+
+/* ---------- LETTER ---------- */
+.letter-section{background:linear-gradient(135deg,#fff8ed,#ffd9bd)}
+.letter-box{
+  max-width:850px;margin:50px auto 0;text-align:center;
+  padding:55px 25px;border-radius:35px;background:#fffdf8;
+  box-shadow:0 25px 70px rgba(89,47,25,.12);
+}
+.envelope{
+  width:min(420px,85vw);height:250px;margin:10px auto 25px;
+  background:#efb07b;position:relative;border-radius:12px;
+  cursor:pointer;transition:.5s;box-shadow:0 15px 30px rgba(80,40,20,.15);
+}
+.envelope:before{
+  content:"";position:absolute;inset:0;
+  clip-path:polygon(0 0,50% 52%,100% 0);
+  background:#f8c99f;z-index:3;transition:.5s;transform-origin:top;
+}
+.envelope.open:before{transform:rotateX(180deg);z-index:0}
+.letter-paper{
+  position:absolute;left:8%;right:8%;top:20px;bottom:20px;
+  background:#fffdf8;padding:30px 25px;text-align:left;z-index:2;
+  transition:.7s;box-shadow:0 8px 20px rgba(50,20,10,.1);
+}
+.envelope:not(.open) .letter-paper{transform:translateY(60px);opacity:.2}
+.letter-paper h3{font-family:'Caveat',cursive;color:var(--orange);font-size:34px}
+.letter-paper p{line-height:1.75;font-size:14px;margin-top:10px}
+.open-hint{font-family:'Caveat',cursive;font-size:28px;color:var(--orange)}
+.voice-btn{
+  border:0;background:var(--orange);color:white;border-radius:999px;
+  padding:12px 20px;margin-top:18px
+}
+
+/* ---------- GIFTS ---------- */
+.gifts{background:#fff4e8}
+.gift-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:25px;margin-top:50px}
+.gift{
+  background:#fff;padding:30px;border-radius:28px;text-align:center;
+  border:2px solid #f6d1b2;transition:.3s;
+}
+.gift:hover{transform:translateY(-7px) rotate(-1deg)}
+.gift-icon{font-size:75px;display:block;filter:drop-shadow(0 8px 5px rgba(80,40,20,.1))}
+.gift h3{font-family:'Caveat',cursive;font-size:32px;color:var(--orange);margin:10px}
+.gift p{font-size:14px;line-height:1.7;opacity:.7}
+.gift-reveal{display:none;margin-top:15px;color:var(--brown);font-family:'Caveat',cursive;font-size:24px}
+.gift.revealed .gift-reveal{display:block}
+
+/* ---------- VIDEO ---------- */
+.video-section{background:#4a281d;color:#fff8ed}
+.video-section .section-title{color:#fff8ed}
+.video-section .section-sub{color:#fff8ed}
+.video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:45px}
+.video-card{
+  border-radius:24px;overflow:hidden;background:#633b2b;
+  cursor:pointer;position:relative;min-height:210px;
+}
+.video-card img{width:100%;height:100%;object-fit:cover;opacity:.75;transition:.3s}
+.video-card:hover img{transform:scale(1.05);opacity:.9}
+.play{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font-size:55px;text-shadow:0 5px 20px #000
+}
+.video-label{position:absolute;bottom:15px;left:18px;font-weight:700}
+
+/* modal */
+.modal{
+  position:fixed;inset:0;background:rgba(30,14,8,.85);z-index:10000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal.show{display:flex}
+.modal-box{width:min(900px,100%);background:#fff8ed;padding:15px;border-radius:25px;position:relative}
+.modal-box video{width:100%;max-height:75vh;border-radius:15px;background:#20130e}
+.close{position:absolute;right:15px;top:15px;z-index:2;border:0;border-radius:50%;width:38px;height:38px;background:white}
+
+/* ---------- MUSIC ---------- */
+.music-section{background:#f2d9c8}
+.music-card{
+  max-width:900px;margin:45px auto 0;background:#fff8ed;border-radius:30px;
+  padding:30px;display:flex;gap:25px;align-items:center;
+  box-shadow:0 20px 50px rgba(80,40,20,.1)
+}
+.album{
+  width:145px;height:145px;border-radius:50%;
+  background:conic-gradient(var(--orange),#ffd166,var(--coral),var(--orange));
+  display:grid;place-items:center;font-size:50px;flex:none;
+  animation:spin 7s linear infinite paused;
+}
+.album.playing{animation-play-state:running}
+@keyframes spin{to{transform:rotate(360deg)}}
+.music-info{flex:1}
+.music-info h3{font-family:'Caveat',cursive;font-size:38px;color:var(--orange)}
+.music-info p{opacity:.65;margin:4px 0 15px}
+.music-controls{display:flex;gap:10px}
+.music-controls button{border:0;border-radius:999px;padding:11px 18px;background:var(--orange);color:white}
+audio{width:100%;margin-top:15px}
+
+/* ---------- FINAL ---------- */
+.final{
+  min-height:80vh;display:grid;place-items:center;text-align:center;
+  background:
+   radial-gradient(circle at 20% 20%,#ffd166 0 4%,transparent 4.5%),
+   radial-gradient(circle at 80% 70%,#f3a6a0 0 5%,transparent 5.5%),
+   linear-gradient(135deg,#fff1dc,#ffbd80);
+}
+.final h2{
+  font-family:'Playfair Display',serif;font-style:italic;
+  color:var(--orange);font-size:clamp(55px,10vw,115px);line-height:.9;
+}
+.final p{max-width:600px;margin:25px auto;line-height:1.9}
+.replay{
+  border:0;background:var(--brown);color:white;padding:14px 22px;border-radius:999px
+}
+
+/* ---------- CONFETTI ---------- */
+.confetti{
+  position:fixed;top:-20px;width:9px;height:15px;z-index:9998;
+  pointer-events:none;animation:fall linear forwards;
+}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:850px){
+  .hero-photo{position:relative;right:auto;top:auto;width:70%;max-width:290px;margin:50px auto 0}
+  .hero{min-height:auto}
+  .reason-grid,.gift-grid,.video-grid{grid-template-columns:1fr 1fr}
+  .memory-grid{grid-template-columns:1fr 1fr}
+  .music-card{flex-direction:column;text-align:center}
+}
+@media(max-width:560px){
+  .section{padding:80px 5vw}
+  .hero{padding:30px 5vw 70px}
+  .reason-grid,.gift-grid,.video-grid,.memory-grid{grid-template-columns:1fr}
+  .section-title{font-size:48px}
+  .hero h2{font-size:70px}
+  .envelope{height:215px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ==========================================================
+     1. EDIT THESE FIRST
+     ==========================================================
+     PASSCODE: change "0210" below.
+     PHOTOS: put your photos inside /images/ and change names if needed.
+     AUDIO: put your audio files inside /audio/.
+     VIDEOS: put your videos inside /videos/.
+     ========================================================== -->
+
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-bow">🎀</div>
+    <div class="script" style="font-size:25px;color:#7b5848">a tiny world, just for you</div>
+    <h1>Unlock<br>your surprise</h1>
+    <p>There is something waiting for you inside. Only you know the secret code. ♡</p>
+
+    <div class="dots" id="dots">
+      <span class="dot"></span><span class="dot"></span>
+      <span class="dot"></span><span class="dot"></span>
+    </div>
+
+    <div class="keypad">
+      <button class="key" onclick="pressKey('1')">1</button>
+      <button class="key" onclick="pressKey('2')">2</button>
+      <button class="key" onclick="pressKey('3')">3</button>
+      <button class="key" onclick="pressKey('4')">4</button>
+      <button class="key" onclick="pressKey('5')">5</button>
+      <button class="key" onclick="pressKey('6')">6</button>
+      <button class="key" onclick="pressKey('7')">7</button>
+      <button class="key" onclick="pressKey('8')">8</button>
+      <button class="key" onclick="pressKey('9')">9</button>
+      <button class="key" onclick="clearCode()">⌫</button>
+      <button class="key" onclick="pressKey('0')">0</button>
+      <button class="key" onclick="checkCode()">♡</button>
+    </div>
+    <div id="error"></div>
+    <div class="gate-note">Tip: make the passcode a date, inside joke, or secret only she knows.</div>
+  </div>
+</div>
+
+<div id="world">
+
+<!-- ================= HERO ================= -->
+<header class="hero" id="top">
+  <div class="hero-top">
+    <div class="logo">made especially for you ♡</div>
+    <button class="sound-btn" onclick="toggleSiteMusic()">♫ <span id="soundText">sound on</span></button>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-small">welcome to your little universe</div>
+    <h2>Happy <span>Birthday,</span> <i>Slay Queen.</i></h2>
+    <p class="hero-message">
+      If a normal birthday wish could never be enough for someone like you,
+      then I thought… why not make you a whole little world instead?
+    </p>
+    <a class="scroll" href="#reasons">start exploring ↓</a>
+
+    <div class="hero-photo floating">
+      <div class="photo-frame">
+        <div class="tape"></div>
+        <img src="images1.jpg" alt="Our favourite memory">
+        <div class="hero-sticker">this<br>one ♡</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= REASONS ================= -->
+<section class="section reasons" id="reasons">
+  <div class="blob one"></div>
+  <div class="section-inner">
+    <div class="section-kicker">little things i love about you</div>
+    <h2 class="section-title">Reasons this world<br>needed you in it.</h2>
+    <p class="section-sub">I LOVE YOU Yrrrr.</p>
+
+    <div class="reason-grid">
+      <article class="reason">
+        <div class="emoji">🌻</div>
+        <h3>Your kind heart</h3>
+        <p>You are the pure soul.You somehow make people feel seen without even trying.Your are just unique piece in the whole world there can be no one else like you. Your style, your dressing sense, your fashion sense, your mood swings you are just you 💋</p>
+      </article>
+      <article class="reason">
+        <div class="emoji">🫶</div>
+        <h3>The way you care</h3>
+        <p>Even your tiny acts of care become memories I keep forever. Always advice me what is good for me what is not, sometimes i should Love myself too, i should take care of myself too. I just love you and I also want to take care of you lifetime.  </p>
+      </article>
+      <article class="reason">
+        <div class="emoji">😂</div>
+        <h3>Your nonsense</h3>
+        <p>Some of my favourite moments are the completely stupid ones.The befikri side of yours, just dancing like a mad, lauughing like no one is here, your practice clothes of morning practices and your outfit during janpath visit (ek influencer ki reel mein aagyi thi aise shirt and kachhe mein 😂) </p>
+      </article>
+      <article class="reason">
+        <div class="emoji">✨</div>
+        <h3>Your little magic</h3>
+        <p>You bring a strange amount of light into ordinary days for real. i have always said you this that your are a sunshine. You bring different kind of energy during practices. Without you, i'm really not enjoying any practices of dancesoc, i know you are in delhi but those days hit different, regularly watching you dancing, laughing, talking, gossiping, and i used to stare you so long now this is so rare. i'm hating this, but my love for you is longlasting, forever.</p>
+      </article>
+      <article class="reason">
+        <div class="emoji">🧡</div>
+        <h3>Our comfort</h3>
+        <p>The era where silence isn't awkward and everything feels easy. Whether everything was fine or not, it still felt good to see everyone together and the difficult times passed. some of the worst times we have shared together are also our memories cuz we all were together in those difficult times too, got everyone's back.</p>
+      </article>
+      <article class="reason">
+        <div class="emoji">🎀</div>
+        <h3>Simply… you</h3>
+        <p>No grand reason. I'm just really, really glad I found you. really thankful for the god to make you sit nearby me in whacking practices. i love uuuuuuuuuuuuu THANK YOU SO MUCH GOD </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MEMORY WALL ================= -->
+<section class="section memories" id="memories">
+  <div class="section-inner">
+    <div class="section-kicker">museum of us</div>
+    <h2 class="section-title">A few moments<br>I would keep forever.</h2>
+    <p class="section-sub">Add as many photos as you want. The cards are deliberately imperfect, like a real memory wall.</p>
+
+    <div class="memory-grid">
+      <figure class="polaroid"><img src="photo1.jpg"><figcaption>that day ♡</figcaption></figure>
+      <figure class="polaroid"><img src="photo2.jpg"><figcaption>us being us</figcaption></figure>
+      <figure class="polaroid"><img src="photo3.jpg"><figcaption>one for the books</figcaption></figure>
+      <figure class="polaroid"><img src="photo4.jpg"><figcaption>core memory</figcaption></figure>
+      <figure class="polaroid"><img src="photo5.jpg"><figcaption>look at us 😭</figcaption></figure>
+      <figure class="polaroid"><img src="photo6.jpg"><figcaption>still makes me smile</figcaption></figure>
+      <figure class="polaroid"><img src="photo7.jpg"><figcaption>another favourite</figcaption></figure>
+      <figure class="polaroid"><img src="photo8.jpg"><figcaption>and another ♡</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TIMELINE ================= -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-kicker">our little timeline</div>
+    <h2 class="section-title">How we got here.</h2>
+
+    <div class="timeline-wrap">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <h3>The beginning</h3>
+        <p>We both can never forget our beginning, when stars in the sky took a sigh of relief and said "finally they met". Thanks to samya for taking so long leave.and remember redhima's joke jispr aapko kuch zyada hi hasi aagayi thi... ps: I'm genuinely grateful to have you as my best friend. i love you. ps:you're so damn pretty bhai.  .</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <h3>The era of inside jokes</h3>
+        <p> Our bond started getting stronger with that chai ki tapri pr bitching se and then jokes, and eveything. We all became very important part of each other's lives. ps:bhai maine aapki punjabi accent aur punjabi sab chai ki tapri pr hi suna tha that was the time i fall for you.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <h3>The difficult days</h3>
+        <p> There are times when everything around us was not good.but we all together managed to be with each other. support each other in their breakdowns.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <h3>Right now</h3>
+        <p>And here we are. Another birthday. Another year of memories waiting to happen. I know I'm not able to make it to your birthday today, but just remember I celebrate you every day. Jab se hum mile hai whenever i meet you i always celebrate you, jaise aapke alawa koi hai hi nahi mere aaspaas. i'm always with you just be happy. LOVE YOU</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LETTER + VOICE ================= -->
+<section class="section letter-section" id="letter">
+  <div class="section-inner">
+    <div class="section-kicker">please open this slowly</div>
+    <h2 class="section-title">Something I<br>couldn't say casually.</h2>
+
+    <div class="letter-box">
+      <div class="open-hint" id="letterHint">remember this, remember this… ♡</div>
+
+      <div class="envelope" id="envelope" onclick="openLetter()">
+        <div class="letter-paper">
+          <h3>Dear you,</h3>
+          <p>
+            I don't know if I say it enough, but having you in my life has made
+            so many ordinary days feel special. I hope you know that you are
+            loved, appreciated and celebrated — not only today, but on all the
+            random Tuesdays too.
+          </p>
+          <p>
+            I hope this year gives you reasons to laugh loudly, people who
+            choose you gently, dreams that scare you in a good way, and memories
+            that make you stop and think, “wow, life is actually beautiful.”
+          </p>
+          <p><b>Happy birthday. I'm really lucky to have you. 🧡</b></p>
+        </div>
+      </div>
+
+     
+    </div>
+  </div>
+</section>
+
+<!-- ================= GIFTS ================= -->
+<section class="section gifts">
+  <div class="section-inner">
+    <div class="section-kicker">three tiny presents</div>
+    <h2 class="section-title">Choose one.<br>Don't peek.</h2>
+
+    <div class="gift-grid">
+      <div class="gift" onclick="revealGift(this)">
+        <span class="gift-icon">🎁</span>
+        <h3>Gift 01</h3>
+        <p>Maybe this one has a surprise.</p>
+        <div class="gift-reveal"> 7 Crore </div>
+      </div>
+
+      <div class="gift" onclick="revealGift(this)">
+        <span class="gift-icon">🎀</span>
+        <h3>Gift 02</h3>
+        <p>Definitely don't click this one.</p>
+        <div class="gift-reveal">A promise: more stupid memories together. 🫂</div>
+      </div>
+
+      <div class="gift" onclick="revealGift(this)">
+        <span class="gift-icon">💌</span>
+        <h3>Gift 03</h3>
+        <p>Okay fine, you can have this one.</p>
+        <div class="gift-reveal">You are one of my favourite people. That's it. That's the gift. 🧡</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VIDEOS ================= -->
+<section class="section video-section" id="videos">
+  <div class="section-inner">
+    <div class="section-kicker" style="color:#ffd166">moving memories</div>
+    <h2 class="section-title">Some memories<br>need to move.</h2>
+    <p class="section-sub">Tap any card to open the video. Replace the video file names with your own.</p>
+
+    <div class="video-grid">
+      <div class="video-card" onclick="openVideo('videos/video1.mp4','Memory 01')">
+        <img src="videos/video1.jpg" alt="">
+        <div class="play">▶</div><div class="video-label">Memory 01</div>
+      </div>
+      <div class="video-card" onclick="openVideo('videos/video2.mp4','Memory 02')">
+        <img src="videos/video2.jpg" alt="">
+        <div class="play">▶</div><div class="video-label">Memory 02</div>
+      </div>
+      <div class="video-card" onclick="openVideo('videos/video3.mp4','Memory 03')">
+        <img src="videos/video3.jpg" alt="">
+        <div class="play">▶</div><div class="video-label">Memory 03</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MUSIC ================= -->
+<section class="section music-section" id="music">
+  <div class="section-inner">
+    <div class="section-kicker">our soundtrack</div>
+    <h2 class="section-title">One song.<br>One feeling.</h2>
+
+    <div class="music-card">
+      <div class="album" id="album">♫</div>
+      <div class="music-info">
+        <h3>Your favourite song</h3>
+        <p>Put her favourite song here — this section is all hers.</p>
+        <div class="music-controls">
+          <button onclick="playFavourite()">▶ play</button>
+          <button onclick="pauseFavourite()">Ⅱ pause</button>
+        </div>
+        <audio id="favouriteSong" controls>
+          <source src="audio/favourite-song.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FINAL ================= -->
+<section class="section final">
+  <div class="section-inner">
+    <div class="section-kicker">the end… or maybe not</div>
+    <h2>May life be<br>extra kind to you.</h2>
+    <p>
+      Thank you for existing, for staying, for laughing with me, for becoming
+      part of my favourite memories. If you ever forget how loved you are,
+      come back to this little world.
+    </p>
+    <button class="replay" onclick="location.href='#top'">↗ start again</button>
+  </div>
+</section>
+
+</div>
+
+<!-- VIDEO MODAL -->
+<div class="modal" id="videoModal">
+  <div class="modal-box">
+    <button class="close" onclick="closeVideo()">✕</button>
+    <h3 id="videoTitle" style="padding:8px 5px 12px;color:#4a281d;font-family:'Caveat';font-size:30px"></h3>
+    <video id="videoPlayer" controls playsinline></video>
+  </div>
+</div>
+
+<!-- AUDIO FILES -->
+<audio id="birthdayTune" preload="auto">
+  <source src="audio/birthday-tune.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="birthdayVoice" preload="auto">
+  <source src="audio/birthday-voice.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="letterVoice" preload="auto">
+  <source src="audio/letter-voice.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* ==========================================================
+   EASY SETTINGS
+   ========================================================== */
+
+// CHANGE THIS TO HER SECRET 4-DIGIT PASSCODE:
+const PASSCODE = "0210";
+
+let entered = "";
+let musicOn = true;
+
+function pressKey(n){
+  if(entered.length >= 4) return;
+  entered += n;
+  updateDots();
+  document.getElementById("error").textContent = "";
+}
+
+function clearCode(){
+  entered = entered.slice(0,-1);
+  updateDots();
+}
+
+function updateDots(){
+  document.querySelectorAll(".dot").forEach((dot,i)=>{
+    dot.classList.toggle("filled",i < entered.length);
+  });
+}
+
+function checkCode(){
+  if(entered === PASSCODE){
+    unlock();
+  }else{
+    document.getElementById("error").textContent = "Hmm… that's not it. Try again, birthday girl ♡";
+    entered = "";
+    updateDots();
+  }
+}
+
+function unlock(){
+  document.getElementById("gate").style.display = "none";
+  document.getElementById("world").style.display = "block";
+  document.body.style.overflowX = "hidden";
+
+  // Start birthday sound after the user's keypad interaction.
+  const tune = document.getElementById("birthdayTune");
+  tune.volume = 0.55;
+  tune.play().catch(()=>{});
+
+  setTimeout(()=>{
+    const voice = document.getElementById("birthdayVoice");
+    voice.volume = 1;
+    voice.play().catch(()=>{});
+  }, 900);
+
+  confettiBurst(90);
+}
+
+function toggleSiteMusic(){
+  const tune = document.getElementById("birthdayTune");
+  const btn = document.getElementById("soundText");
+
+  if(tune.paused){
+    tune.play().catch(()=>{});
+    musicOn = true;
+    btn.textContent = "sound on";
+  }else{
+    tune.pause();
+    musicOn = false;
+    btn.textContent = "sound off";
+  }
+}
+
+function playVoice(id){
+  const a = document.getElementById(id);
+  a.currentTime = 0;
+  a.play().catch(()=>{});
+}
+
+function openLetter(){
+  const envelope = document.getElementById("envelope");
+  const hint = document.getElementById("letterHint");
+  envelope.classList.toggle("open");
+
+  if(envelope.classList.contains("open")){
+    hint.textContent = "okay… now read this slowly ♡";
+    playVoice("letterVoice");
+    confettiBurst(35);
+  }else{
+    hint.textContent = "remember this, remember this… ♡";
+  }
+}
+
+function revealGift(card){
+  card.classList.toggle("revealed");
+}
+
+function openVideo(src,title){
+  const modal = document.getElementById("videoModal");
+  const player = document.getElementById("videoPlayer");
+  document.getElementById("videoTitle").textContent = title;
+  player.src = src;
+  modal.classList.add("show");
+  player.play().catch(()=>{});
+}
+
+function closeVideo(){
+  const modal = document.getElementById("videoModal");
+  const player = document.getElementById("videoPlayer");
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+  modal.classList.remove("show");
+}
+
+function playFavourite(){
+  const song = document.getElementById("favouriteSong");
+  const album = document.getElementById("album");
+  song.play().catch(()=>{});
+  album.classList.add("playing");
+}
+function pauseFavourite(){
+  const song = document.getElementById("favouriteSong");
+  const album = document.getElementById("album");
+  song.pause();
+  album.classList.remove("playing");
+}
+
+document.getElementById("favouriteSong").addEventListener("ended",()=>{
+  document.getElementById("album").classList.remove("playing");
+});
+
+function confettiBurst(amount){
+  const symbols=["✦","●","◆","♥","★"];
+  for(let i=0;i<amount;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+    c.style.left=Math.random()*100+"vw";
+    c.style.fontSize=(8+Math.random()*14)+"px";
+    c.style.animationDuration=(2.5+Math.random()*3)+"s";
+    c.style.opacity=.5+Math.random()*.5;
+    c.style.color=["#f47b20","#ffd166","#ef6f61","#718c6b","#c7b8ea"][Math.floor(Math.random()*5)];
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),6000);
+  }
+}
+
+document.addEventListener("keydown",(e)=>{
+  if(e.key>="0" && e.key<="9") pressKey(e.key);
+  if(e.key==="Enter") checkCode();
+  if(e.key==="Backspace") clearCode();
+});
+
+document.getElementById("videoModal").addEventListener("click",(e)=>{
+  if(e.target.id==="videoModal") closeVideo();
+});
+</script>
+</body>
+</html>
